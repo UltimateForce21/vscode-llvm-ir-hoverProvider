@@ -2,6 +2,7 @@
 // This file is distributed under the MIT License. See LICENSE.md for details.
 //
 
+import { CancellationToken, DefinitionLink, DefinitionProvider, Position, Range, TextDocument } from "vscode";
 import * as vscode from "vscode";
 import { LLVMIRDefinitionProvider } from "./llvmir/definition_provider";
 import { LLVMIRFoldingProvider } from "./llvmir/folding_provider";
@@ -22,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
     const llvmirDocumentFilter: vscode.DocumentFilter = { pattern: "**/*.ll" };
     const lsp = new LspModelProvider();
 
-    const disposable = vscode.commands.registerCommand('extension.reverseWord', function() {
+    /* const disposable = vscode.commands.registerCommand('extension.reverseWord', function() {
 		// Get the active text editor
 		const editor = vscode.window.activeTextEditor;
 
@@ -41,22 +42,24 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// THINGS TO DO: test to see if this works
-			
-			//code on how to replace text in a document
-			/* 
-			editor.edit(editBuilder => {
-				editBuilder.replace(selection, reversed);
-			});
-			 */
 		}
-	});
+    }); */
 
 
     context.subscriptions.push(
         vscode.languages.setLanguageConfiguration("llvm", llvmConfiguration),
         vscode.languages.registerDefinitionProvider(llvmirDocumentFilter, new LLVMIRDefinitionProvider(lsp)),
         vscode.languages.registerReferenceProvider(llvmirDocumentFilter, new LLVMReferenceProvider(lsp)),
-        vscode.languages.registerFoldingRangeProvider(llvmirDocumentFilter, new LLVMIRFoldingProvider(lsp))
+        vscode.languages.registerFoldingRangeProvider(llvmirDocumentFilter, new LLVMIRFoldingProvider(lsp)),
+        vscode.languages.registerHoverProvider({ scheme: 'file', language: 'llvm' }, {
+            provideHover(TextDocument, Position, CancellationToken) {
+                // Implement logic to generate hover information here
+                return{
+                    contents: ['Hover Content']
+                }
+            }
+        })
+        
     );
 }
 
